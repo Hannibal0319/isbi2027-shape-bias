@@ -1,0 +1,14 @@
+images 463 matched nuclei 10454
+sk    mean 0.866 0.935 1.106 | shift/SD +0.95 +3.30
+cv    mean 0.866 0.935 1.104 | shift/SD +0.95 +3.27
+ij    mean 0.837 0.868 0.946 | shift/SD +0.48 +1.68
+cr    mean 0.906 0.915 0.937 | shift/SD +0.13 +0.46
+ours  mean 0.896 0.896 0.900 | shift/SD -0.01 +0.05
+rc    mean 0.904 0.910 0.923 | shift/SD +0.10 +0.28
+images 1500 matched nuclei 12279
+sk    mean 0.851 0.925 1.125 | shift/SD +0.68 +2.53
+cv    mean 0.851 0.924 1.108 | shift/SD +0.67 +2.37
+ij    mean 0.818 0.849 0.915 | shift/SD +0.31 +0.96
+cr    mean 0.882 0.889 0.909 | shift/SD +0.06 +0.25
+ours  mean 0.872 0.869 0.878 | shift/SD -0.03 +0.05
+rc    mean 0.881 0.884 0.890 | shift/SD +0.03 +0.09

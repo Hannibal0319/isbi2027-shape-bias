@@ -6,7 +6,7 @@ P=df['P_skimage/CellProfiler']/df.scale
 E={'skimage / CellProfiler':4*np.pi*df.A/df['P_skimage/CellProfiler']**2,
    'OpenCV':4*np.pi*df.A/df['P_OpenCV']**2,'ImageJ':4*np.pi*df.A/df['P_ImageJ']**2,
    'PyRadiomics':4*np.pi*df.A/df['P_PyRadiomics']**2,'Crofton':4*np.pi*df.A/df['P_Crofton (skimage)']**2,
-   'F1 (ours)':4*np.pi*df.A/((P/KAPPA+np.pi)*df.scale)**2}
+   'F1 (ours)':4*np.pi*df.A/((P/KAPPA+np.pi)*df.scale)**2,'RCC (ours)':4*np.pi*df.A/df['P_rc']**2}
 df=df[df.groupby(['img','cls','iid']).scale.transform('count')==3]
 def d(a,b): return (a.mean()-b.mean())/np.sqrt((a.var()+b.var())/2)
 rng=np.random.default_rng(0)

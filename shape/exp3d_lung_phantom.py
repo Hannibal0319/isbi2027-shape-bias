@@ -4,6 +4,7 @@ from radiomics import shape
 from scipy.ndimage import label as cc, zoom, gaussian_filter, map_coordinates
 from skimage.measure import marching_cubes, mesh_surface_area
 from crofton3d import sphericity as sph_crofton
+from runcorr import crofton as crofton_rc
 logging.getLogger('radiomics').setLevel(logging.ERROR)
 rng=np.random.default_rng(0); FINE=0.5; SIG=1.5; INPLANE=0.7; SLICES=[0.7,1.25,2.5,3.75,5.0]
 def prad(m,sp):
@@ -28,15 +29,15 @@ for f in sorted(glob.glob(sys.argv[1]+'/labelsTr/lung_*.nii.gz')):
         ext=np.array(fine.shape)*FINE
         rec=dict(case=os.path.basename(f),comp=j,Req=(3*Vtrue/(4*np.pi))**(1/3),true=true)
         for s in SLICES:
-            tsp=np.array([s,INPLANE,INPLANE]); pv=[];cv=[]
+            tsp=np.array([s,INPLANE,INPLANE]); pv=[];cv=[];rv=[]
             for rep in range(3):
                 off=rng.uniform(0,1,3)*tsp
                 axes=[np.arange(o,e,t) for o,e,t in zip(off,ext,tsp)]
                 Z,Y,X=np.meshgrid(*axes,indexing='ij')
                 m=map_coordinates(fine,[Z/FINE,Y/FINE,X/FINE],order=1)>=0.5
                 if m.sum()<5: continue
-                m=np.pad(m,1); pv.append(prad(m,tsp)); cv.append(sph_crofton(m,tsp))
-            rec[f'prad_{s}']=np.mean(pv); rec[f'cr_{s}']=np.mean(cv)
+                m=np.pad(m,1); pv.append(prad(m,tsp)); cv.append(sph_crofton(m,tsp)); V=m.sum()*np.prod(tsp); rv.append((36*np.pi*V**2)**(1/3)/crofton_rc(m,tuple(tsp),True))
+            rec[f'prad_{s}']=np.mean(pv); rec[f'cr_{s}']=np.mean(cv); rec[f'rc_{s}']=np.mean(rv)
         rows.append(rec); print(rec['case'],round(rec['Req'],1),round(true,3),' '.join(f"{s}:{rec[f'prad_{s}']-true:+.3f}/{rec[f'cr_{s}']-true:+.3f}" for s in SLICES),flush=True)
 pd.DataFrame(rows).to_csv('exp3d_lung_phantom.csv',index=False)
 d=pd.DataFrame(rows)

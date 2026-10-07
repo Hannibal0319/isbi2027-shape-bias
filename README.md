@@ -1,4 +1,4 @@
-# ISBI 2027 submission: "Smaller looks rounder: resolution-dependent bias of shape descriptors in open-source bioimage and radiomics software"
+# ISBI 2027 submission: "Smaller looks rounder: correcting resolution-dependent bias of shape descriptors in bioimage and radiomics software"
 
 Deadline: **Mon Oct 26, 2026, 23:59 New York time** (EDAS). 4 pages including references (a 5th page is allowed only for references/acknowledgements, at $200). Review is single-blind, so author names go on the paper.
 
@@ -12,6 +12,7 @@ Deadline: **Mon Oct 26, 2026, 23:59 New York time** (EDAS). 4 pages including re
   The large per-nucleus files (`shape/real_*`) are not in git; `extract_real.py` regenerates them.
 
 ## Main results
+0. **Method (new): run-corrected Crofton estimator (RCC)**, `shape/runcorr.py`. Crofton estimators miss chords shorter than the sampling step h. For smooth boundaries the chord-length density is linear near 0, so the expected missed chords = n1/6, where n1 is the number of single-sample runs along that direction (second order: (19 n1 − 4 n2)/66). It is parameter-free and works in 2D and on anisotropic 3D grids. 2D circularity bias ≤0.005 at all radii ≥2 px (Crofton: 0.05 at r=2); 3D sphericity bias within ±0.005 for R≥5 mm up to 5 mm slices (Crofton: +0.046); lung phantoms at 5 mm: +0.026 (Crofton +0.042, PyRadiomics −0.136).
 1. The default perimeter in scikit-image `regionprops` (and therefore CellProfiler FormFactor), OpenCV `arcLength` and ImageJ makes circularity depend on object size: +0.55 at r=2 px, 0 at r≈8, −0.08 at r=48.
 2. Model: chain code gives P ≈ κ(L − 2√2), with κ = 8(√2−1)/π and δ = √2/π. Marching squares (PyRadiomics) gives κL; polygonised pixel edges give (4/π)L.
 3. F1 is a post-hoc correction, P/κ + π (δ′ calibrated on synthetic shapes only: minimax 0.52, rounded to ½). With Cellpose re-segmentation it brings the resolution shift down from 0.7–3.3 SD to ≤0.05 SD.
@@ -32,11 +33,12 @@ Deadline: **Mon Oct 26, 2026, 23:59 New York time** (EDAS). 4 pages including re
 | real nuclei, re-digitization | `python extract_real.py pannuke 2656`, `python extract_real.py bbbc 670`, then `prad_worker.py` on each `*_crops.npz` | `real_*.csv`, `real_*_prad.npy` |
 | real nuclei, Cellpose re-segmentation | `../.venvcp/Scripts/python exp_reseg.py 10000 reseg_bbbc_all.csv`, `../.venvcp/Scripts/python exp_reseg_pn.py 1500 reseg_pn_1500.csv` | `reseg_*.csv` |
 | lung phantoms | `../.venv39/Scripts/python exp3d_lung_phantom.py ../data/msd/Task06_Lung` | `exp3d_lung_phantom.csv` |
+| RCC on real crops | `python add_rc_real.py` (adds `P_rc` to `real_*.csv`) | `real_*.csv` |
 | Table 1 numbers | `python make_tables.py` | stdout |
 | Table 2 (biological contrasts, classifier drop) | `python exp_contrast.py`; `python analyze_real2.py real_pannuke_2656.csv real_pannuke_2656_prad.npy` | stdout |
 | Figure 1 (incl. schematic) | `python fig_main.py` | `../paper/figures/fig_main.pdf` |
 
-Library code: `estimators.py` (all 2D perimeter estimators, F1), `crofton3d.py` (F3), `shapes.py` (synthetic shapes).
+Library code: `runcorr.py` (RCC, 2D/3D, any spacing), `estimators.py` (all 2D perimeter estimators, F1), `crofton3d.py` (plain spacing-aware 3D Crofton), `shapes.py` (synthetic shapes).
 
 ## Before submitting (TODO for the authors)
 - Fill in the author names and affiliations in `paper/main.tex` (currently "Anonymous Author(s)"; ISBI review is single-blind).

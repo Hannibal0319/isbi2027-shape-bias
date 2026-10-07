@@ -1,6 +1,7 @@
 import numpy as np, pandas as pd, SimpleITK as sitk, logging
 from radiomics import shape
 from crofton3d import sphericity as sph_crofton
+from runcorr import crofton as crofton_rc
 from scipy.ndimage import zoom
 logging.getLogger('radiomics').setLevel(logging.ERROR)
 rng=np.random.default_rng(7)
@@ -31,7 +32,7 @@ for shape_kind,ratio in [('sphere',(1,1,1)),('ellipsoid',(1,0.75,0.5))]:
         if m.sum()<5: continue
         true=(36*np.pi*(4/3*np.pi*np.prod(axes))**2)**(1/3)/ell_area(*axes)
         mi=(zoom(m.astype(float),(sz,1,1),order=1)>=0.5).astype(np.uint8)
-        rows.append(dict(kind=shape_kind,R=Req,slice=sz,true=true,prad=prad(m,(sz,1,1)),prad_iso=prad(mi,(1,1,1)),crofton=sph_crofton(m,(sz,1,1))))
+        rows.append(dict(kind=shape_kind,R=Req,slice=sz,true=true,prad=prad(m,(sz,1,1)),prad_iso=prad(mi,(1,1,1)),crofton=sph_crofton(m,(sz,1,1)),rcc=(36*np.pi*(m.sum()*sz)**2)**(1/3)/crofton_rc(m,(sz,1.,1.),True)))
 pd.DataFrame(rows).to_csv('exp3d_synth.csv',index=False)
-d=pd.DataFrame(rows); d['e_prad']=d.prad-d.true; d['e_iso']=d.prad_iso-d.true; d['e_cr']=d.crofton-d.true
-print(d.groupby(['kind','R','slice'])[['true','e_prad','e_iso','e_cr']].mean().round(3).to_string())
+d=pd.DataFrame(rows); d['e_prad']=d.prad-d.true; d['e_iso']=d.prad_iso-d.true; d['e_cr']=d.crofton-d.true; d['e_rc']=d.rcc-d.true
+print(d.groupby(['kind','R','slice'])[['true','e_prad','e_iso','e_cr','e_rc']].mean().round(3).to_string())

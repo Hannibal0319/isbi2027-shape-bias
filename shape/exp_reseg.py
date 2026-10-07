@@ -7,6 +7,7 @@ from skimage.measure import regionprops
 from cellpose import models
 sys.path.insert(0,'.')
 from estimators import p_skimage, p_crofton, p_corrected, p_opencv, p_imagej
+from runcorr import crofton as crofton_rc
 N=int(sys.argv[1]); out=sys.argv[2]
 model=models.Cellpose(gpu=True,model_type='nuclei')
 dirs=sorted(glob.glob('../data/bbbc038/train/*'))
@@ -43,13 +44,13 @@ for d in dirs:
             cm=np.pad(m[ys.min():ys.max()+1,xs.min():xs.max()+1],2).astype(np.uint8)
             if cm.sum()<4: ok=False; break
             A=cm.sum()*f*f
-            for k,fn in [('sk',p_skimage),('cv',p_opencv),('ij',p_imagej),('cr',p_crofton),('ours',p_corrected)]:
+            for k,fn in [('sk',p_skimage),('cv',p_opencv),('ij',p_imagej),('cr',p_crofton),('ours',p_corrected),('rc',lambda c: crofton_rc(c))]:
                 rec[f'FF_{k}_{f}']=4*np.pi*A/(fn(cm)*f)**2
             rec[f'A_{f}']=A
         if ok: rows.append(rec)
     if used>=N: break
 df=pd.DataFrame(rows); df.to_csv(out,index=False)
 print('images',used,'matched nuclei',len(df))
-for k in ['sk','cv','ij','cr','ours']:
+for k in ['sk','cv','ij','cr','ours','rc']:
     a1,a2,a4=df[f'FF_{k}_1'],df[f'FF_{k}_2'],df[f'FF_{k}_4']; sd=a1.std()
     print(f"{k:5s} mean {a1.mean():.3f} {a2.mean():.3f} {a4.mean():.3f} | shift/SD {((a2-a1).mean()/sd):+.2f} {((a4-a1).mean()/sd):+.2f}")

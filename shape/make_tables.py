@@ -15,7 +15,7 @@ def sim(csv,prad):
     return pd.DataFrame(out).T, len(common)
 def reseg(csv):
     df=pd.read_csv(csv); out={}
-    names={'sk':'skimage/CellProfiler','cv':'OpenCV','ij':'ImageJ','cr':'Crofton (skimage)','ours':'corrected chain (ours)'}
+    names={'sk':'skimage/CellProfiler','cv':'OpenCV','ij':'ImageJ','cr':'Crofton (skimage)','ours':'corrected chain (ours)','rc':'rc'}
     for f in [1,2,4]:
         P=np.sqrt(4*np.pi*df[f'A_{f}']/df[f'FF_sk_{f}'])
         df[f'FF_mat_{f}']=df[f'FF_sk_{f}']*(1-0.5/(P/f/(2*np.pi)+0.5))**2
@@ -29,4 +29,4 @@ pn,npn=sim('real_pannuke_2656.csv','real_pannuke_2656_prad.npy')
 bb,nbb=sim('real_bbbc_670.csv','real_bbbc_670_prad.npy')
 rpn,nrpn=reseg('reseg_pn_1500.csv'); rbb,nrbb=reseg('reseg_bbbc_all.csv')
 T=pd.concat({'PN sim':pn,'PN cellpose':rpn,'BB sim':bb,'BB cellpose':rbb},axis=1)
-print(npn,nrpn,nbb,nrbb); print(T.round(2).to_string())
+print(npn,nrpn,nbb,nrbb); pd.set_option('display.width',250); print(T.round(2).to_string())
