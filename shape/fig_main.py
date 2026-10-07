@@ -7,7 +7,7 @@ from estimators import KAPPA, _pixel_edge_polygon
 plt.rcParams.update({'font.size':6.5,'font.family':'serif','axes.linewidth':0.6,'xtick.major.width':0.6,'ytick.major.width':0.6,
                      'xtick.major.size':2.5,'ytick.major.size':2.5,'axes.spines.top':False,'axes.spines.right':False,'pdf.fonttype':42,'legend.fontsize':5.6})
 C=dict(blue='#2a78d6',orange='#eb6834',aqua='#1baf7a',magenta='#e87ba4',violet='#4a3aa7',red='#e34948',grey='#7a7974')
-fig,ax=plt.subplots(1,5,figsize=(7.1,1.45),gridspec_kw=dict(wspace=0.42,width_ratios=[0.8,1.4,0.66,0.66,0.98]))
+fig,ax=plt.subplots(1,5,figsize=(7.1,1.38),gridspec_kw=dict(wspace=0.42,width_ratios=[0.8,1.4,0.66,0.66,0.98]))
 # (a) schematic: digitized disk, true boundary and traced polygons
 s=ax[0]; R=3.3; c0=np.array([0.27,0.18]); n=6
 yy,xx=np.mgrid[-n:n+1,-n:n+1]; m=(((xx-c0[0])**2+(yy-c0[1])**2)<=R*R).astype(np.uint8)
