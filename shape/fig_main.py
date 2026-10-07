@@ -46,7 +46,7 @@ ax[2].legend(title='resolution',title_fontsize=5.6,loc='upper right',frameon=Fal
 ymax=max(ax[2].get_ylim()[1],ax[3].get_ylim()[1]); ax[2].set_ylim(0,ymax); ax[3].set_ylim(0,ymax)
 # (e) 3D
 d=pd.read_csv('exp3d_synth.csv'); d=d[d.R>=10]; b=ax[4]
-for col,lab,c,mk,ls in [('prad','PyRadiomics (native)',C['magenta'],'v','-'),('prad_iso','PyRadiomics (iso. resampled)',C['violet'],'D','--'),('crofton','F3 (ours)',C['red'],'*','-')]:
+for col,lab,c,mk,ls in [('prad','PyRadiomics (native)',C['magenta'],'v','-'),('prad_iso','PyRadiomics (iso. resampled)',C['violet'],'D','--'),('crofton','F3 (Crofton)',C['red'],'*','-')]:
     g=(d[col]-d.true).groupby(d.slice); b.plot(g.mean().index,g.mean().values,marker=mk,ms=2.2,lw=0.85,ls=ls,color=c,label=lab)
     b.fill_between(g.mean().index,g.quantile(0.1),g.quantile(0.9),color=c,alpha=0.15,lw=0)
 b.axhline(0,color='#bbb',lw=0.5,zorder=0); b.set_xlabel('slice thickness (mm)'); b.set_ylabel('sphericity bias'); b.set_title(r'(e) 3D, synthetic, R$\geq$10 mm',fontsize=6.5)
