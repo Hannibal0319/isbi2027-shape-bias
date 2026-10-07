@@ -1,0 +1,21 @@
+# data and environments (download instructions in README)
+data/
+.venv*/
+# large derived real-data files (regenerate with extract_real.py)
+shape/real_*.csv
+shape/real_*_crops.npz
+shape/real_*_prad.npy
+shape/exp1_masks.npz
+# build / cache
+__pycache__/
+*.pyc
+shape/*.png
+paper/tmpl/
+paper/*.aux
+paper/*.log
+paper/*.bbl
+paper/*.blg
+paper/*.fls
+paper/*.fdb_latexmk
+paper/*.out
+paper/*.synctex.gz
