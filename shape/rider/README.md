@@ -6,6 +6,6 @@ Derived per-tumour values are not redistributed (dataset licence); only the scri
 1. Download into `data/rider/`: `series.json` from the NBIA API (`getSeries?Collection=RIDER Lung CT`), the "Tumor Segmentation" SEG series into `seg/`, and the CT series they reference into `ct/` (NBIA `getImage`; about 14 GB compressed).
 2. Copy these scripts to `data/rider/` and run (Python 3.9 venv with pyradiomics, pydicom, pydicom-seg, SimpleITK):
    `python convert.py` (CT + SEG to NIfTI, index), `python qc.py` (slice-spacing check; non-uniform series excluded),
-   then assign visits by acquisition-time clustering (see the session notes in the paper-1 repo README),
+   `python assign_visits.py` (test/retest by acquisition-time clustering),
    `python rider_shape.py` (paper 1: sphericity per reconstruction), `python rider_texture.py` (paper 2: soft-tissue internal reference + tumour texture),
    `python rider_analyze.py` (all numbers used in both papers).
