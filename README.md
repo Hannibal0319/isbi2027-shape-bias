@@ -38,6 +38,15 @@ Deadline: **Mon Oct 26, 2026, 23:59 New York time** (EDAS). 4 pages including re
 | Table 2 (biological contrasts, classifier drop) | `python exp_contrast.py`; `python analyze_real2.py real_pannuke_2656.csv real_pannuke_2656_prad.npy` | stdout |
 | Figure 1 (incl. schematic) | `python fig_main.py` | `../paper/figures/fig_main.pdf` |
 
+**Drop-in use** (`shape/shapefix.py`):
+```python
+from shapefix import perimeter_rcc, sphericity_rcc, fix_cellprofiler
+P = perimeter_rcc(mask2d)                          # 2D run-corrected Crofton perimeter
+psi = sphericity_rcc(mask3d, spacing=(5, .7, .7))  # 3D sphericity on the native grid
+df = fix_cellprofiler(df, prefix='Nuclei_AreaShape_')  # repair an existing CellProfiler table (F1)
+```
+Practicality: `cp_demo.py` runs CellProfiler's own MeasureObjectSizeShape code (cellprofiler-library from GitHub) on 68,574 BBBC038 masks and repairs its table in 4 ms; `bench_runtime.py` times RCC against scikit-image and PyRadiomics.
+
 Library code: `runcorr.py` (RCC, 2D/3D, any spacing), `estimators.py` (all 2D perimeter estimators, F1), `crofton3d.py` (plain spacing-aware 3D Crofton), `shapes.py` (synthetic shapes).
 
 ## Before submitting (TODO for the authors)
