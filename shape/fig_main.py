@@ -1,54 +1,95 @@
-import numpy as np, pandas as pd, matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
+"""Paper 1, Figure 1: two-row layout.
+Top: (a) traced polygons on a digitized disk, (b) 2D circularity bias vs size, (c) 3D sphericity bias vs slice thickness.
+Bottom: (d,e) form factor of real nuclei re-segmented at three resolutions, default estimator vs F1."""
+import numpy as np, pandas as pd, matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from scipy.stats import gaussian_kde
 import cv2
 from skimage.measure import find_contours
 from estimators import KAPPA, _pixel_edge_polygon
-plt.rcParams.update({'font.size':6.5,'font.family':'serif','axes.linewidth':0.6,'xtick.major.width':0.6,'ytick.major.width':0.6,
-                     'xtick.major.size':2.5,'ytick.major.size':2.5,'axes.spines.top':False,'axes.spines.right':False,'pdf.fonttype':42,'legend.fontsize':5.6})
-C=dict(blue='#2a78d6',orange='#eb6834',aqua='#1baf7a',magenta='#e87ba4',violet='#4a3aa7',red='#e34948',grey='#7a7974')
-fig,ax=plt.subplots(1,5,figsize=(7.1,1.38),gridspec_kw=dict(wspace=0.42,width_ratios=[0.8,1.4,0.66,0.66,0.98]))
-# (a) schematic: digitized disk, true boundary and traced polygons
-s=ax[0]; R=3.3; c0=np.array([0.27,0.18]); n=6
-yy,xx=np.mgrid[-n:n+1,-n:n+1]; m=(((xx-c0[0])**2+(yy-c0[1])**2)<=R*R).astype(np.uint8)
-for y,x in zip(*np.nonzero(m)): s.add_patch(Rectangle((x-n-0.5,y-n-0.5),1,1,fc='#e4e3df',ec='white',lw=0.4))
-t=np.linspace(0,2*np.pi,200); s.plot(c0[0]+R*np.cos(t),c0[1]+R*np.sin(t),'k--',lw=0.7,label='true boundary')
-cs,_=cv2.findContours(m,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE); q=cs[0][:,0,:]-n; q=np.vstack([q,q[:1]])
-s.plot(q[:,0],q[:,1],color=C['blue'],lw=1.0,label='chain code')
-ms=find_contours(np.pad(m,1).astype(float),0.5)[0]; s.plot(ms[:,1]-1-n,ms[:,0]-1-n,color=C['magenta'],lw=1.0,label='marching sq.')
-pe=_pixel_edge_polygon(m)-1-n-0.5; pe=np.vstack([pe,pe[:1]]); s.plot(pe[:,0],pe[:,1],color=C['violet'],lw=0.9,label='pixel edges')
-s.set_aspect('equal'); s.set_xlim(-4.8,4.8); s.set_ylim(-8.2,4.6); s.axis('off')
-s.legend(loc='lower center',bbox_to_anchor=(0.38,0.0),frameon=False,handlelength=1.3,borderaxespad=0,labelspacing=0.12,ncol=1,columnspacing=0.6,fontsize=5.4)
-s.set_title('(a) disk, $r$=3.3 px',fontsize=6.5)
-# (b) synthetic 2D bias
-df=pd.read_csv('exp1_synth_rc.csv'); a=ax[1]
-series=[('P_skimage/CellProfiler','skimage/CellProf.',C['blue'],'o'),
-        ('P_ImageJ','ImageJ',C['aqua'],'^'),('P_PyRadiomics','PyRadiomics',C['magenta'],'v'),('matlab','MATLAB R23a',C['violet'],'D'),
-        ('P_Crofton (skimage)','Crofton',C['grey'],'x'),('P_corrected chain (ours)','F1 (ours)',C['orange'],'*'),('P_rc','RCC (ours)',C['red'],'P')]
-for k,lab,c,mk in series:
-    est=df.ff_matlab2023 if k=='matlab' else 4*np.pi*df.Ad/df[k]**2
-    mm=(est-df.ff_true).groupby(df.r).mean(); a.plot(mm.index,mm.values,marker=mk,ms=2.2,lw=0.85,color=c,label=lab)
-th_chain=(df.ff_true*((df.L/(KAPPA*(df.L-2*np.sqrt(2))))**2-1)).groupby(df.r).mean(); th_ms=(df.ff_true*(1/KAPPA**2-1)).groupby(df.r).mean()
-r=th_chain.index[th_chain.index>=3]
-a.plot(r,th_chain[r],'k--',lw=0.7,label='model (1)',zorder=5); a.plot(th_ms.index,th_ms.values,'k--',lw=0.7,zorder=5)
-a.axhline(0,color='#bbb',lw=0.5,zorder=0); a.set_xscale('log'); a.set_xticks([2,4,8,16,32]); a.set_xticklabels([2,4,8,16,32])
-a.set_xlabel('equivalent radius (px)'); a.set_ylabel('circularity bias'); a.set_ylim(-0.12,0.78); a.set_yticks([0,0.2,0.4]); a.set_title('(b) 2D, synthetic',fontsize=6.5)
-a.legend(loc='upper right',frameon=False,handlelength=1.2,borderaxespad=0,labelspacing=0.12,ncol=2,columnspacing=0.4,fontsize=4.9,handletextpad=0.3)
-# (c,d) real distributions
-Rr=pd.read_csv('reseg_bbbc_all.csv'); x=np.linspace(0.45,1.6,300); shades=['#9ec5f4','#2a78d6','#0b3e7e']
-for a,k,tt in [(ax[2],'sk','(c) default (skimage)'),(ax[3],'ours','(d) F1 (ours)')]:
-    for f,c,lab in zip([1,2,4],shades,['native','1/2','1/4']):
-        v=Rr[f'FF_{k}_{f}'].values; v=v[(v>0.3)&(v<2)]
-        a.plot(x,gaussian_kde(v)(x),color=c,lw=0.95,label=lab); a.axvline(np.median(v),color=c,lw=0.6,ls=':')
-    a.axvline(1,color='#bbb',lw=0.5,zorder=0); a.set_yticks([]); a.spines['left'].set_visible(False)
-    a.set_xlabel('form factor'); a.set_title(tt,fontsize=6.5); a.set_xlim(0.45,1.6)
-ax[2].legend(title='resolution',title_fontsize=5.6,loc='upper right',frameon=False,handlelength=1.1,borderaxespad=0,labelspacing=0.15)
-ymax=max(ax[2].get_ylim()[1],ax[3].get_ylim()[1]); ax[2].set_ylim(0,ymax); ax[3].set_ylim(0,ymax)
-# (e) 3D
-d=pd.read_csv('exp3d_synth.csv'); d=d[d.R>=5]; b=ax[4]
-for col,lab,c,mk,ls in [('prad','PyRad. native',C['magenta'],'v','-'),('prad_iso','PyRad. iso-resampled',C['violet'],'D','--'),('crofton','Crofton',C['grey'],'x','-'),('rcc','RCC (ours)',C['red'],'P','-')]:
-    g=(d[col]-d.true).groupby(d.slice); b.plot(g.mean().index,g.mean().values,marker=mk,ms=2.2,lw=0.85,ls=ls,color=c,label=lab)
-    b.fill_between(g.mean().index,g.quantile(0.1),g.quantile(0.9),color=c,alpha=0.15,lw=0)
-b.axhline(0,color='#bbb',lw=0.5,zorder=0); b.set_xlabel('slice thickness (mm)'); b.set_ylabel('sphericity bias'); b.set_title(r'(e) 3D, synthetic, R$\geq$5 mm',fontsize=6.5)
-b.set_ylim(-0.29,0.07); b.set_yticks([0,-0.1,-0.2]); b.legend(loc='lower center',ncol=2,frameon=False,handlelength=1.3,borderaxespad=0.1,labelspacing=0.15,columnspacing=0.6,fontsize=5.0,handletextpad=0.3)
-fig.savefig('../paper/figures/fig_main.pdf',bbox_inches='tight'); fig.savefig('fig_main.png',dpi=250,bbox_inches='tight')
+
+plt.rcParams.update({'font.size': 7.5, 'font.family': 'serif', 'axes.linewidth': 0.6, 'xtick.major.width': 0.6,
+                     'ytick.major.width': 0.6, 'xtick.major.size': 2.5, 'ytick.major.size': 2.5,
+                     'axes.spines.top': False, 'axes.spines.right': False, 'pdf.fonttype': 42, 'legend.fontsize': 6.8,
+                     'axes.titlesize': 7.8, 'axes.titleweight': 'bold'})
+# one colour per method, used in every panel
+COL = {'default': '#2a78d6', 'ImageJ': '#1baf7a', 'PyRadiomics': '#e87ba4', 'iso': '#4a3aa7',
+       'Crofton': '#7a7974', 'F1': '#eb6834', 'RCC': '#e34948'}
+
+fig = plt.figure(figsize=(7.1, 2.6))
+gs = fig.add_gridspec(2, 12, height_ratios=[1, 0.72], hspace=0.72, wspace=3.6)
+ax_a = fig.add_subplot(gs[0, 0:2])
+ax_b = fig.add_subplot(gs[0, 2:8])
+ax_c = fig.add_subplot(gs[0, 8:12])
+ax_d = fig.add_subplot(gs[1, 0:6])
+ax_e = fig.add_subplot(gs[1, 6:12], sharey=ax_d)
+
+# (a) schematic
+s = ax_a; R = 3.3; c0 = np.array([0.27, 0.18]); n = 6
+yy, xx = np.mgrid[-n:n + 1, -n:n + 1]; m = (((xx - c0[0]) ** 2 + (yy - c0[1]) ** 2) <= R * R).astype(np.uint8)
+for y, x in zip(*np.nonzero(m)):
+    s.add_patch(Rectangle((x - n - 0.5, y - n - 0.5), 1, 1, fc='#e4e3df', ec='white', lw=0.4))
+t = np.linspace(0, 2 * np.pi, 200)
+s.plot(c0[0] + R * np.cos(t), c0[1] + R * np.sin(t), 'k--', lw=0.8, label='true boundary')
+cs, _ = cv2.findContours(m, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE); q = cs[0][:, 0, :] - n; q = np.vstack([q, q[:1]])
+s.plot(q[:, 0], q[:, 1], color=COL['default'], lw=1.2, label='chain code')
+ms = find_contours(np.pad(m, 1).astype(float), 0.5)[0]
+s.plot(ms[:, 1] - 1 - n, ms[:, 0] - 1 - n, color=COL['PyRadiomics'], lw=1.2, label='marching sq.')
+s.set_aspect('equal'); s.set_xlim(-4.6, 4.8); s.set_ylim(-4.6, 4.6); s.axis('off')
+s.set_title('(a) outlines', loc='left', x=-0.42)
+
+# (b) 2D circularity bias vs size
+df = pd.read_csv('exp1_synth_rc.csv'); b = ax_b
+series = [('P_skimage/CellProfiler', 'skimage / CellProfiler / OpenCV', 'default', 'o'),
+          ('P_ImageJ', 'ImageJ', 'ImageJ', '^'),
+          ('P_PyRadiomics', 'PyRadiomics (IBSI)', 'PyRadiomics', 'v'),
+          ('P_Crofton (skimage)', 'Crofton', 'Crofton', 'x'),
+          ('P_corrected chain (ours)', 'F1, post hoc (ours)', 'F1', 's'),
+          ('P_rc', 'RCC (ours)', 'RCC', 'P')]
+for k, lab, ck, mk in series:
+    est = 4 * np.pi * df.Ad / df[k] ** 2
+    g = (est - df.ff_true).groupby(df.r).mean()
+    b.plot(g.index, g.values, marker=mk, ms=3, lw=1.1, color=COL[ck], label=lab)
+th = (df.ff_true * ((df.L / (KAPPA * (df.L - 2 * np.sqrt(2)))) ** 2 - 1)).groupby(df.r).mean()
+r = th.index[th.index >= 3]
+b.plot(r, th[r], color='k', ls=':', lw=1.1, label='model, Eq. (2)', zorder=5)
+b.axhline(0, color='#bbb', lw=0.6, zorder=0)
+b.set_xscale('log'); b.set_xticks([2, 4, 8, 16, 32]); b.set_xticklabels([2, 4, 8, 16, 32])
+b.set_ylim(-0.12, 0.6); b.set_xlabel('object radius (pixels)'); b.set_ylabel('circularity bias')
+b.set_title('(b) 2D circularity error vs. object size', loc='left')
+
+# (c) 3D sphericity bias vs slice thickness
+d3 = pd.read_csv('exp3d_synth.csv'); d3 = d3[d3.R >= 5]; c = ax_c
+for col, lab, ck, mk, ls in [('prad', 'PyRadiomics', 'PyRadiomics', 'v', '-'),
+                             ('prad_iso', 'PyRadiomics, resampled', 'iso', 'D', '--'),
+                             ('crofton', 'Crofton', 'Crofton', 'x', '-'),
+                             ('rcc', 'RCC (ours)', 'RCC', 'P', '-')]:
+    g = (d3[col] - d3.true).groupby(d3.slice)
+    c.plot(g.mean().index, g.mean().values, marker=mk, ms=3, lw=1.1, ls=ls, color=COL[ck], label=lab)
+    c.fill_between(g.mean().index, g.quantile(0.1), g.quantile(0.9), color=COL[ck], alpha=0.13, lw=0)
+c.axhline(0, color='#bbb', lw=0.6, zorder=0)
+c.set_xlabel('slice thickness (mm)'); c.set_ylabel('sphericity bias'); c.set_ylim(-0.24, 0.05); c.set_yticks([0, -0.1, -0.2]); c.yaxis.labelpad = 1
+c.set_title('(c) 3D sphericity error', loc='left')
+
+# (d,e) real nuclei, Cellpose re-segmentation at three resolutions
+Rr = pd.read_csv('reseg_bbbc_all.csv'); x = np.linspace(0.45, 1.5, 300)
+shades = {1: '#9ec5f4', 2: '#2a78d6', 4: '#0b3e7e'}
+labels = {1: 'native', 2: r'$\frac{1}{2}$ resolution', 4: r'$\frac{1}{4}$ resolution'}
+for a, k, ttl in [(ax_d, 'sk', '(d) real nuclei: default estimator'),
+                  (ax_e, 'ours', '(e) same nuclei: F1 (ours)')]:
+    for f in [1, 2, 4]:
+        v = Rr[f'FF_{k}_{f}'].values; v = v[(v > 0.3) & (v < 2)]
+        a.plot(x, gaussian_kde(v)(x), color=shades[f], lw=1.3, label=labels[f])
+        a.axvline(np.median(v), color=shades[f], lw=0.8, ls=':')
+    a.axvline(1, color='#999', lw=0.6, zorder=0)
+    a.text(1.005, 0.97, 'perfect\ncircle', transform=a.get_xaxis_transform(), fontsize=6, color='#777', va='top')
+    a.set_xlim(0.45, 1.5); a.set_xlabel('form factor (circularity)'); a.set_title(ttl, loc='left')
+ax_d.set_ylabel('density'); ax_d.set_yticks([]); plt.setp(ax_e.get_yticklabels(), visible=False)
+ax_d.legend(loc='upper left', frameon=False, handlelength=1.6, labelspacing=0.2, borderaxespad=0)
+hb, lb = ax_b.get_legend_handles_labels(); hc, lc = ax_c.get_legend_handles_labels()
+H = dict(zip(lb, hb)); H.update({l: h for h, l in zip(hc, lc) if l not in ('PyRadiomics', 'Crofton', 'RCC (ours)')})
+order = ['skimage / CellProfiler / OpenCV', 'ImageJ', 'PyRadiomics (IBSI)', 'PyRadiomics, resampled', 'Crofton', 'F1, post hoc (ours)', 'RCC (ours)', 'model, Eq. (2)']
+fig.legend([H[k] for k in order], order, loc='upper center', bbox_to_anchor=(0.5, 1.09), ncol=4, frameon=False, handlelength=1.8, columnspacing=1.4, labelspacing=0.3)
+fig.savefig('../paper/figures/fig_main.pdf', bbox_inches='tight'); fig.savefig('fig_main.png', dpi=220, bbox_inches='tight')

@@ -35,7 +35,7 @@ Deadline: **Mon Oct 26, 2026, 23:59 New York time** (EDAS). 4 pages including re
 | lung phantoms | `../.venv39/Scripts/python exp3d_lung_phantom.py ../data/msd/Task06_Lung` | `exp3d_lung_phantom.csv` |
 | RCC on real crops | `python add_rc_real.py` (adds `P_rc` to `real_*.csv`) | `real_*.csv` |
 | Table 1 numbers | `python make_tables.py` | stdout |
-| Table 2 (biological contrasts, classifier drop) | `python exp_contrast.py`; `python analyze_real2.py real_pannuke_2656.csv real_pannuke_2656_prad.npy` | stdout |
+| biological contrasts, classifier drop (Results text) | `python exp_contrast.py`; `python analyze_real2.py real_pannuke_2656.csv real_pannuke_2656_prad.npy` | stdout |
 | Figure 1 (incl. schematic) | `python fig_main.py` | `../paper/figures/fig_main.pdf` |
 
 **Drop-in use** (`shape/shapefix.py`):
@@ -50,7 +50,7 @@ Practicality: `cp_demo.py` runs CellProfiler's own MeasureObjectSizeShape code (
 Library code: `runcorr.py` (RCC, 2D/3D, any spacing), `estimators.py` (all 2D perimeter estimators, F1), `crofton3d.py` (plain spacing-aware 3D Crofton), `shapes.py` (synthetic shapes).
 
 ## Before submitting (TODO for the authors)
-- Fill in the author names and affiliations in `paper/main.tex` (currently "Anonymous Author(s)"; ISBI review is single-blind).
+- Author and affiliation are set (Peter Zsoldos, Tampere University). Confirm the exact EMJM programme name and any grant number required in the Acknowledgments.
 - Make https://github.com/Hannibal0319/isbi2027-shape-bias public before submission (the paper links to it; it was created private).
 - Check the AI-use disclosure in the Acknowledgments (ISBI requires one) and the conflict-of-interest/funding statement.
 - Optional: open a scikit-image / CellProfiler issue proposing F1/Crofton as default (adds impact).
