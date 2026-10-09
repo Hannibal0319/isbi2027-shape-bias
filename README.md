@@ -36,6 +36,7 @@ Deadline: **Mon Oct 26, 2026, 23:59 New York time** (EDAS). 4 pages including re
 | RCC on real crops | `python add_rc_real.py` (adds `P_rc` to `real_*.csv`) | `real_*.csv` |
 | Table 1 numbers | `python make_tables.py` | stdout |
 | biological contrasts, classifier drop (Results text) | `python exp_contrast.py`; `python analyze_real2.py real_pannuke_2656.csv real_pannuke_2656_prad.npy` | stdout |
+| direct check of the 1/6 identity (Sec. 3) | `python verify_sixth.py` | `verify_sixth.txt` |
 | Figure 1 (incl. schematic) | `python fig_main.py` | `../paper/figures/fig_main.pdf` |
 
 **Drop-in use** (`shape/shapefix.py`):
