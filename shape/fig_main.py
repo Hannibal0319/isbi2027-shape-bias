@@ -37,16 +37,16 @@ def bias2d(ax, keys):
 
 
 fig, (a, b) = plt.subplots(2, 1, figsize=(3.45, 2.5), gridspec_kw=dict(hspace=0.58))
-bias2d(a, ['default', 'ImageJ', 'PyRadiomics'])
+bias2d(a, ['default'])
 th = (df.ff_true * ((df.L / (KAPPA * (df.L - 2 * np.sqrt(2)))) ** 2 - 1)).groupby(df.r).mean()
 r = th.index[th.index >= 3]
-a.plot(r, th[r], color='k', ls=':', lw=1.1, label='model (2)', zorder=5)
-a.set_ylim(-0.12, 0.6); a.set_ylabel('circularity bias'); a.set_title('(a) existing tools: bias grows as objects shrink', loc='left')
+a.plot(r, th[r], color='k', ls=':', lw=1.3, label='model, Eq. (2)', zorder=5)
+a.set_ylim(-0.12, 0.6); a.set_ylabel('circularity bias'); a.set_title('(a) default estimator: bias grows as objects shrink', loc='left')
 bias2d(b, ['Crofton', 'F1', 'RCC'])
 b.set_ylim(-0.025, 0.06); b.set_yticks([-0.02, 0, 0.02, 0.04, 0.06])
 b.set_title(r'(b) corrections, $8\times$ finer scale: RCC stays near zero', loc='left')
 a.set_xlabel(''); a.set_ylim(-0.12, 0.72)
-a.legend(loc='upper right', ncol=2, columnspacing=1.0, **LEG)
+a.legend(loc='upper right', **LEG)
 b.legend(loc='upper right', ncol=3, columnspacing=1.0, **LEG)
 fig.savefig(OUT + 'fig_2d.pdf', bbox_inches='tight'); fig.savefig('fig_2d.png', dpi=250, bbox_inches='tight')
 
