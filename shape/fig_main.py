@@ -79,7 +79,7 @@ for a, k, ttl in [(ax_d, 'sk', '(d) real nuclei, default chain code'), (ax_e, 'o
         a.axvline(np.median(v), color=shades[f], lw=0.8, ls=':')
     a.axvline(1, color='#999', lw=0.6, zorder=0)
     a.text(1.008, 0.95, 'perfect circle', transform=a.get_xaxis_transform(), fontsize=6.2, color='#666', va='top')
-    a.set_xlim(0.45, 1.5); a.set_xlabel('form factor'); a.set_title(ttl, loc='left')
+    a.set_xlim(0.45, 1.5); a.set_xlabel('circularity (FF)'); a.set_title(ttl, loc='left')
 ax_d.set_ylabel('density'); ax_d.set_yticks([]); plt.setp(ax_e.get_yticklabels(), visible=False)
 ax_d.legend(loc='upper left', **LEG)
 fig.savefig('../paper/figures/fig_main.pdf', bbox_inches='tight'); fig.savefig('fig_main.png', dpi=220, bbox_inches='tight')

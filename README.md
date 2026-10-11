@@ -1,4 +1,4 @@
-# ISBI 2027 submission: "Smaller looks rounder: correcting resolution-dependent bias of shape descriptors in bioimage and radiomics software"
+# ISBI 2027 submission: "Smaller looks rounder: a parameter-free resolution correction for circularity and sphericity"
 
 Deadline: **Mon Oct 26, 2026, 23:59 New York time** (EDAS). 4 pages including references (a 5th page is allowed only for references/acknowledgements, at $200). Review is single-blind, so author names go on the paper.
 
