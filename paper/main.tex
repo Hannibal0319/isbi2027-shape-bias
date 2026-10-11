@@ -26,18 +26,18 @@ Nuclear circularity quantifies pleomorphism in histopathology, CellProfiler's \e
 
 Pixel counts estimate area and volume without bias; boundary length is harder~\cite{kulpa1977,lindblad2005}. Kulpa~\cite{kulpa1977} derived the large-object length factor of chain codes; Crofton estimators, which count boundary crossings of lattice lines, are unbiased in the large-object limit~\cite{legland2007}, with error bounds due to the finite set of directions~\cite{kiderlen2009}, and are recommended for 2D perimeters~\cite{legland2026}; MATLAB patched its circularity for small objects in 2023~\cite{matlab2023}. Two gaps remain: no model explains the \emph{size dependence} of open-source estimators, and Crofton estimators are biased for small objects and thick slices, as chords shorter than the sampling step are never seen, an error distinct from the direction error and not corrected so far.
 
-\noindent\textbf{Contribution.} A parameter-free correction that makes circularity and sphericity independent of resolution, in two forms. (i) For new analyses, the \emph{run-corrected Crofton} (RCC) estimator, in 2D and on anisotropic 3D grids, based on the identity that for smooth boundaries the expected number of missed chords is one sixth of the single-sample runs (Fig.~\ref{fig:overview}c). (ii) For existing CellProfiler/scikit-image tables, F1, a one-line repair derived from a closed-form model, $P\approx\kappa(L-2\pi\delta)$, of the default estimators' size dependence. Evidence: an audit of eight implementations against ground truth, 89k real nuclei, and 351 real CT reconstructions, where IBSI sphericity looks thickness-robust only through cancelling errors.
+\noindent\textbf{Contribution.} A parameter-free correction that makes circularity and sphericity independent of resolution, in two forms. (i) For new analyses, the \emph{run-corrected Crofton} (RCC) estimator, in 2D and on anisotropic 3D grids, based on the identity that for smooth boundaries the expected number of missed chords is one sixth of the single-sample runs (Fig.~\ref{fig:overview}b). (ii) For existing CellProfiler/scikit-image tables, F1, a one-line repair derived from a closed-form model, $P\approx\kappa(L-2\pi\delta)$, of the default estimators' size dependence. Evidence: an audit of eight implementations against ground truth, 89k real nuclei, and 351 real CT reconstructions, where IBSI sphericity looks thickness-robust only through cancelling errors.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{figures/fig_overview.pdf}
-\caption{Overview. (a) The default $\ff$ (scikit-image, CellProfiler) of one nucleus drifts with its size; RCC does not. (b) The chain code runs inside the boundary. (c) Lines sampled every $h$ miss short chords (thick bar), on average one sixth of the single-sample runs (circled).}
+\caption{Overview. (a) The default circularity (scikit-image, CellProfiler) of one nucleus changes with its size; RCC does not. (b) Lines sampled every $h$ miss chords shorter than $h$; on average they are one sixth of the runs with a single sample, which RCC adds back.}
 \label{fig:overview}
 \end{figure}
 
 \section{Why default estimators depend on size}
 \label{sec:model}
-Let $X\subset\mathbb{R}^2$ have a smooth boundary of length $L$, digitized on a unit grid as $D=X\cap\mathbb{Z}^2$ with random sub-pixel position and orientation. Most tools trace a polygon along $D$ whose edges take a few lattice directions (Fig.~\ref{fig:overview}b). If a boundary element $ds$ at tangent angle $\theta$ becomes polygon length $g(\theta)\,ds$, and the polygon lies on average a distance $\delta$ inside $\partial X$, Steiner's formula (a closed curve moved inward by $\delta$ has length $L-2\pi\delta$) gives
+Let $X\subset\mathbb{R}^2$ have a smooth boundary of length $L$, digitized on a unit grid as $D=X\cap\mathbb{Z}^2$ with random sub-pixel position and orientation. Most tools trace a polygon along $D$ whose edges take a few lattice directions. If a boundary element $ds$ at tangent angle $\theta$ becomes polygon length $g(\theta)\,ds$, and the polygon lies on average a distance $\delta$ inside $\partial X$, Steiner's formula (a closed curve moved inward by $\delta$ has length $L-2\pi\delta$) gives
 \begin{equation}
 P \approx \kappa\,(L-2\pi\delta),\qquad \kappa=\tfrac{1}{2\pi}\textstyle\int_0^{2\pi} g(\theta)\,d\theta .
 \label{eq:model}
@@ -75,7 +75,7 @@ where $n_{1,d}$ counts runs of exactly one sample along $d$. Plugging $N_d^{\tex
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{figures/fig_2d.pdf}
-\caption{Mean circularity bias on 5{,}000 synthetic shapes vs.\ object radius. (a) Existing tools (default: chain code of scikit-image, CellProfiler, OpenCV; dotted: Eq.~\eqref{eq:disk}). (b) The corrections on an $8\times$ finer scale.}
+\caption{Mean circularity bias on 5{,}000 synthetic shapes vs.\ object radius. (a) Existing tools; dotted: model, Eq.~\eqref{eq:disk}. (b) Crofton and the two corrections on an $8\times$ finer scale.}
 \label{fig:synth2d}
 \end{figure}
 
@@ -99,26 +99,6 @@ where $n_{1,d}$ counts runs of exactly one sample along $d$. Plugging $N_d^{\tex
 \label{fig:nuclei}
 \end{figure}
 
-\begin{table}[t]
-\centering\footnotesize
-\caption{Real nuclei re-segmented by Cellpose: shift $\Delta/\sigma$ of $\ff$ at $\tfrac12$ and $\tfrac14$ resolution, and area--$\ff$ correlation $\rho_A$ (ideal: 0). Re-digitized annotations rank alike ($\tfrac14$: default ${\le}5.56$, Crofton $0.51$, F1 $0.35$, RCC $0.12$).}
-\label{tab:real}
-\setlength{\tabcolsep}{3.2pt}
-\begin{tabular}{@{}l ccc ccc@{}}
-\toprule
-& \multicolumn{3}{c}{PanNuke (H\&E)} & \multicolumn{3}{c}{BBBC038}\\
-\cmidrule(lr){2-4}\cmidrule(l){5-7}
-$\ff$ from & $\tfrac12$ & $\tfrac14$ & $\rho_{A}$ & $\tfrac12$ & $\tfrac14$ & $\rho_{A}$\\
-\midrule
-default (skimage, CP) & $+0.68$ & $+2.53$ & $-0.34$ & $+0.95$ & $+3.30$ & $-0.56$\\
-MATLAB R2023a & $\phantom{+}0.00$ & $+0.16$ & $-0.05$ & $+0.04$ & $+0.20$ & $-0.19$\\
-Crofton & $+0.06$ & $+0.25$ & $-0.09$ & $+0.13$ & $+0.46$ & $-0.24$\\
-F1 (ours, post hoc) & $-0.03$ & $+0.05$ & $-0.03$ & $-0.01$ & $+0.05$ & $-0.16$\\
-RCC (ours) & $+0.03$ & $+0.09$ & $-0.08$ & $+0.10$ & $+0.28$ & $-0.22$\\
-\bottomrule
-\end{tabular}
-\end{table}
-
 \section{Results}
 \label{sec:results}
 \noindent\textbf{Synthetic 2D (Fig.~\ref{fig:synth2d}).} Chain-code circularity is biased by $+0.55$ at $r=2$\,px, $+0.11$ at 4\,px and $-0.08$ at 48\,px, as Eq.~\eqref{eq:disk} predicts. ImageJ follows the same trend ($+0.09$ to $-0.08$); PyRadiomics and MATLAB R2023a are offset by $\kappa^{-2}$ ($-0.08$ to $-0.09$). Crofton overestimates small objects ($0.050$ at $r=2$, $0.013$ at 4\,px); RCC stays within $0.005$ at every size, at similar variance.
@@ -127,7 +107,7 @@ RCC (ours) & $+0.03$ & $+0.09$ & $-0.08$ & $+0.10$ & $+0.28$ & $-0.22$\\
 
 \noindent\textbf{Real reconstructions (RIDER).} Test--retest repeatability is the same for all estimators (ICC 0.81--0.94 per reconstruction), so RCC costs no precision. From 1.25 to 5\,mm slices, RCC sphericity of the same tumours rises by $+0.097$/$+0.098$ (sharp/smooth kernel; $p<10^{-8}$, Wilcoxon, $n=55$--58) because thick-slice images and contours are smoother; this is not an RCC artefact, whose phantom bias grows by only $0.024$ over the same range. PyRadiomics hides this ($+0.009$, $+0.010$, n.s.) only because its own bias falls with thickness: the PyRadiomics--RCC gap changes by $-0.088$, matching the $-0.078$ predicted by the phantoms: two errors cancel.
 
-\noindent\textbf{Real nuclei (Fig.~\ref{fig:nuclei}; Table~\ref{tab:real}).} With the default estimator, halving the resolution shifts the mean $\ff$ by $0.7$--$0.95\sigma$ and quartering it by $2.5$--$5.6\sigma$, pushing the median BBBC038 nucleus past $\ff=1$. It also correlates circularity with area (Table~\ref{tab:real}). Crofton reduces the shifts to $0.06$--$0.51\sigma$ and RCC to $0.03$--$0.28\sigma$; F1 is the most stable under re-segmentation (${\le}0.05\sigma$).
+\noindent\textbf{Real nuclei (Fig.~\ref{fig:nuclei}).} With the default estimator and Cellpose re-segmentation, halving the resolution shifts the mean $\ff$ by $0.68$--$0.95\sigma$ and quartering it by $2.5$--$3.3\sigma$ ($5.6\sigma$ for re-digitized annotations), pushing the median BBBC038 nucleus past $\ff=1$; it also correlates circularity with area (Spearman $\rho=-0.34$, $-0.56$). MATLAB R2023a, Crofton and RCC reduce the shifts to at most $0.20$, $0.46$ and $0.28\sigma$, and F1 to $0.05\sigma$; on re-digitized annotations RCC is best (${\le}0.12\sigma$; F1 $0.35\sigma$, Crofton $0.51\sigma$).
 \noindent\textbf{Biological contrasts (PanNuke; Cohen's $d$, s.e.\ ${\approx}0.014$).} Inflammatory nuclei are smaller, so the default inflates their extra circularity from $d=0.35$--$0.40$ to $0.67$. At $10\times$, the default reverses the sign of the connective--neoplastic contrast ($-0.62\to+0.11$), whereas RCC preserves it ($-0.77\to-0.72$). With mixed scanners (inflammatory at $20\times$, neoplastic at $40\times$) it reports $d=1.62$ instead of $0.35$--$0.49$. A $40\times$-trained type classifier loses $0.115$ balanced accuracy at $10\times$ with the default $\ff$ and $0.031$ with RCC.
 
 \section{Discussion}

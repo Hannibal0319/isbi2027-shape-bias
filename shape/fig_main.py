@@ -21,7 +21,7 @@ OUT = '../paper/figures/'
 
 # ---------- 2D synthetic ----------
 df = pd.read_csv('exp1_synth_rc.csv')
-COLS = {'default': ('P_skimage/CellProfiler', 'default'), 'ImageJ': ('P_ImageJ', 'ImageJ'),
+COLS = {'default': ('P_skimage/CellProfiler', 'default (skimage, CellProfiler)'), 'ImageJ': ('P_ImageJ', 'ImageJ'),
         'PyRadiomics': ('P_PyRadiomics', 'PyRadiomics'), 'Crofton': ('P_Crofton (skimage)', 'Crofton'),
         'F1': ('P_corrected chain (ours)', 'F1 (ours)'), 'RCC': ('P_rc', 'RCC (ours)')}
 
@@ -36,22 +36,23 @@ def bias2d(ax, keys):
     ax.set_xlabel('object radius (pixels)')
 
 
-fig, (a, b) = plt.subplots(1, 2, figsize=(3.45, 1.55), gridspec_kw=dict(wspace=0.42))
+fig, (a, b) = plt.subplots(2, 1, figsize=(3.45, 2.5), gridspec_kw=dict(hspace=0.58))
 bias2d(a, ['default', 'ImageJ', 'PyRadiomics'])
 th = (df.ff_true * ((df.L / (KAPPA * (df.L - 2 * np.sqrt(2)))) ** 2 - 1)).groupby(df.r).mean()
 r = th.index[th.index >= 3]
 a.plot(r, th[r], color='k', ls=':', lw=1.1, label='model (2)', zorder=5)
-a.set_ylim(-0.12, 0.6); a.set_ylabel('circularity bias'); a.set_title('(a) existing tools', loc='left')
+a.set_ylim(-0.12, 0.6); a.set_ylabel('circularity bias'); a.set_title('(a) existing tools: bias grows as objects shrink', loc='left')
 bias2d(b, ['Crofton', 'F1', 'RCC'])
 b.set_ylim(-0.025, 0.06); b.set_yticks([-0.02, 0, 0.02, 0.04, 0.06])
-b.set_title(r'(b) corrections, $8\times$ zoom', loc='left')
-a.legend(loc='upper right', bbox_to_anchor=(1.03, 1.02), **LEG)
-b.legend(loc='upper right', **LEG)
+b.set_title(r'(b) corrections, $8\times$ finer scale: RCC stays near zero', loc='left')
+a.set_xlabel(''); a.set_ylim(-0.12, 0.72)
+a.legend(loc='upper right', ncol=2, columnspacing=1.0, **LEG)
+b.legend(loc='upper right', ncol=3, columnspacing=1.0, **LEG)
 fig.savefig(OUT + 'fig_2d.pdf', bbox_inches='tight'); fig.savefig('fig_2d.png', dpi=250, bbox_inches='tight')
 
 # ---------- 3D synthetic ----------
 d3 = pd.read_csv('exp3d_synth.csv'); d3 = d3[d3.R >= 5]
-fig, c = plt.subplots(figsize=(3.45, 1.2))
+fig, c = plt.subplots(figsize=(3.45, 1.4))
 for col, lab, k, ls in [('prad', 'PyRadiomics / IBSI', 'PyRadiomics', '-'),
                         ('prad_iso', 'PyRadiomics, resampled', 'PyRadiomics', '--'),
                         ('crofton', 'Crofton', 'Crofton', '-'), ('rcc', 'RCC (ours)', 'RCC', '-')]:
@@ -69,7 +70,7 @@ fig.savefig(OUT + 'fig_3d.pdf', bbox_inches='tight'); fig.savefig('fig_3d.png', 
 Rr = pd.read_csv('reseg_bbbc_all.csv'); x = np.linspace(0.5, 1.45, 300)
 shades = {1: '#b4b2a9', 2: '#6f6d66', 4: '#1f1e1c'}
 labels = {1: 'native', 2: r'$\frac{1}{2}$ resolution', 4: r'$\frac{1}{4}$ resolution'}
-fig, (d, e) = plt.subplots(1, 2, figsize=(3.45, 1.35), sharey=True, gridspec_kw=dict(wspace=0.12))
+fig, (d, e) = plt.subplots(1, 2, figsize=(3.45, 1.5), sharey=True, gridspec_kw=dict(wspace=0.12))
 for ax, k, ttl in [(d, 'sk', '(a) default'), (e, 'ours', '(b) F1 (ours)')]:
     for f in [1, 2, 4]:
         v = Rr[f'FF_{k}_{f}'].values; v = v[(v > 0.3) & (v < 2)]
