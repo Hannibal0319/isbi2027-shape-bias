@@ -2,7 +2,7 @@
 
 Deadline: **Mon Oct 26, 2026, 23:59 New York time** (EDAS). 4 pages including references (a 5th page is allowed only for references/acknowledgements, at $200). Review is single-blind, so author names go on the paper.
 
-- `paper/`: **the submission** (`main.tex`, `refs.bib`, `figures/fig_main.pdf`; build with `latexmk -pdf main.tex`).
+- `paper/`: **the submission** (`main.tex`, `refs.bib`, `figures/fig_*.pdf`; build with `latexmk -pdf main.tex`).
 - `shape/`: all code and results. `shape/pilots/` holds the feasibility scripts that are not used in the paper.
 - `data/` (not in git, about 22 GB):
   - BBBC038 `stage1_train.zip` from https://data.broadinstitute.org/bbbc/BBBC038/, unzipped to `data/bbbc038/train`
@@ -37,7 +37,8 @@ Deadline: **Mon Oct 26, 2026, 23:59 New York time** (EDAS). 4 pages including re
 | Table 1 numbers | `python make_tables.py` | stdout |
 | biological contrasts, classifier drop (Results text) | `python exp_contrast.py`; `python analyze_real2.py real_pannuke_2656.csv real_pannuke_2656_prad.npy` | stdout |
 | direct check of the 1/6 identity (Sec. 3) | `python verify_sixth.py` | `verify_sixth.txt` |
-| Figure 1 (incl. schematic) | `python fig_main.py` | `../paper/figures/fig_main.pdf` |
+| Figures 2--4 (2D, 3D, real nuclei) | `python fig_main.py` | `../paper/figures/fig_2d.pdf`, `fig_3d.pdf`, `fig_nuclei.pdf` |
+| Figure 1 (overview) | `python fig_overview.py` | `../paper/figures/fig_overview.pdf` |
 
 **Drop-in use** (`shape/shapefix.py`):
 ```python
