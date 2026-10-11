@@ -53,6 +53,6 @@ Library code: `runcorr.py` (RCC, 2D/3D, any spacing), `estimators.py` (all 2D pe
 
 ## Before submitting (TODO for the authors)
 - Author and affiliation are set (Peter Zsoldos, Tampere University). The funding acknowledgment uses the official EMJM in Imaging / EU disclaimer from emjm-imaging.eu; ask the programme office whether a grant agreement number must be added.
-- Make https://github.com/Hannibal0319/isbi2027-shape-bias public before submission (the paper links to it; it was created private).
+- https://github.com/Peter-Zsoldos/isbi2027-shape-bias is public (the paper links to it). Make https://github.com/Peter-Zsoldos/isbi2027-texture-bias public too before submission.
 - Check the AI-use disclosure in the Acknowledgments (ISBI requires one) and the conflict-of-interest/funding statement.
 - Optional: open a scikit-image / CellProfiler issue proposing F1/Crofton as default (adds impact).

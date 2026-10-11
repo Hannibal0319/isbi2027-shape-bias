@@ -132,7 +132,7 @@ RCC (ours) & $+0.03$ & $+0.09$ & $-0.08$ & $+0.10$ & $+0.28$ & $-0.22$\\
 
 \section{Discussion}
 \label{sec:disc}
-RCC takes ${<}1$\,ms per 2D object and 3--15\,ms per 3D lesion (9--90$\times$ faster than PyRadiomics). F1 needs no images: on CellProfiler's own output for 68{,}574 BBBC038 masks (identical to scikit-image's) it repaired the table in 4\,ms. Limitations: Eq.~\eqref{eq:rcc} assumes smooth boundaries (objects of about one slice remain biased), and block-averaging only approximates re-imaging. Code: \url{https://github.com/Hannibal0319/isbi2027-shape-bias}.
+RCC takes ${<}1$\,ms per 2D object and 3--15\,ms per 3D lesion (9--90$\times$ faster than PyRadiomics). F1 needs no images: on CellProfiler's own output for 68{,}574 BBBC038 masks (identical to scikit-image's) it repaired the table in 4\,ms. Limitations: Eq.~\eqref{eq:rcc} assumes smooth boundaries (objects of about one slice remain biased), and block-averaging only approximates re-imaging. Code: \url{https://github.com/Peter-Zsoldos/isbi2027-shape-bias}.
 
 \section{Compliance with ethical standards}
 Only public anonymized data were used; no ethics approval was required.
