@@ -4,11 +4,11 @@ Deadline: **Mon Oct 26, 2026, 23:59 New York time** (EDAS). 4 pages including re
 
 - `paper/`: **the submission** (`main.tex`, `refs.bib`, `figures/fig_*.pdf`; build with `latexmk -pdf main.tex`).
 - `shape/`: all code and results. `shape/pilots/` holds the feasibility scripts that are not used in the paper.
-- `data/` (not in git, about 22 GB):
+- `data/` (not in git). To free disk space, the downloaded datasets were deleted after all results were computed (Oct 2026); only BBBC038 and the small RIDER files (`index.csv`, `series.json`, `seg/`, result CSVs) remain. Re-download before re-running experiments:
   - BBBC038 `stage1_train.zip` from https://data.broadinstitute.org/bbbc/BBBC038/, unzipped to `data/bbbc038/train`
   - PanNuke fold 1 from https://warwick.ac.uk/fac/cross_fac/tia/data/pannuke, unzipped to `data/pannuke/fold1`
   - MSD Task06 lung from https://msd-for-monai.s3-us-west-2.amazonaws.com/Task06_Lung.tar, extracted to `data/msd/Task06_Lung`
-  - RIDER Lung CT (TCIA): only the converted NIfTI volumes and masks are kept in `data/rider/nii` (`index.csv` maps them); the raw DICOM was deleted after conversion. To redo the conversion, re-download the series listed in `data/rider/series.json` from TCIA into `data/rider/ct` and run `data/rider/convert.py`.
+  - RIDER Lung CT (TCIA): re-download the series listed in `data/rider/series.json` into `data/rider/ct` and run `data/rider/convert.py` to recreate `data/rider/nii` (the paths `index.csv` uses).
 
   The large per-nucleus files (`shape/real_*`) are not in git; `extract_real.py` regenerates them.
 
@@ -24,7 +24,7 @@ Deadline: **Mon Oct 26, 2026, 23:59 New York time** (EDAS). 4 pages including re
 ## Environments
 - System Python 3.14: numpy, scikit-image 0.26, OpenCV 4.13, scikit-learn, matplotlib.
 - `.venv39` (Python 3.9): pyradiomics 3.0.1, installed with `uv pip install --no-build-isolation pyradiomics==3.0.1` after numpy<2, versioneer and setuptools.
-- `.venvcp` (Python 3.11): cellpose<4 with CUDA torch (cu126 index).
+- `.venvcp` (Python 3.11, deleted to save space; recreate before re-running Cellpose): cellpose<4 with CUDA torch (cu126 index).
 
 ## Reproduce (in `shape/`)
 | step | command | output |
