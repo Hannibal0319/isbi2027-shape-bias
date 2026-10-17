@@ -8,6 +8,7 @@ Deadline: **Mon Oct 26, 2026, 23:59 New York time** (EDAS). 4 pages including re
   - BBBC038 `stage1_train.zip` from https://data.broadinstitute.org/bbbc/BBBC038/, unzipped to `data/bbbc038/train`
   - PanNuke fold 1 from https://warwick.ac.uk/fac/cross_fac/tia/data/pannuke, unzipped to `data/pannuke/fold1`
   - MSD Task06 lung from https://msd-for-monai.s3-us-west-2.amazonaws.com/Task06_Lung.tar, extracted to `data/msd/Task06_Lung`
+  - RIDER Lung CT (TCIA): only the converted NIfTI volumes and masks are kept in `data/rider/nii` (`index.csv` maps them); the raw DICOM was deleted after conversion. To redo the conversion, re-download the series listed in `data/rider/series.json` from TCIA into `data/rider/ct` and run `data/rider/convert.py`.
 
   The large per-nucleus files (`shape/real_*`) are not in git; `extract_real.py` regenerates them.
 
